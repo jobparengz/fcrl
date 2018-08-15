@@ -1,0 +1,40 @@
+#This file is used by the Symfony Service Container
+
+# Parameters can be changed by other services and are used as tokens in services section below.
+parameters:
+  fcrl.entity_store.class: Drupal\FCRLExtension\ServiceContainer\EntityStore
+  fcrl.page_store.class: Drupal\FCRLExtension\ServiceContainer\PageStore
+  fcrl.listener.stores.class: Drupal\FCRLExtension\Listener\StoresListener
+
+  # Context initializer.
+  fcrl.context.initializer.class: Drupal\FCRLExtension\Context\Initializer\FCRLAwareInitializer
+
+  fcrl.parameters: {}
+
+services:
+
+  # Register the EntityStore class as a Service.
+  fcrl.entity_store:
+    class: '%fcrl.entity_store.class%'
+
+  # Register the EntityStore class as a Service.
+  fcrl.page_store:
+    class: '%fcrl.page_store.class%'
+
+  # Set our Initializer class so we can inject EntityStore into each EntityAware Context.
+  fcrl.context.initializer:
+    class: '%fcrl.context.initializer.class%'
+    arguments:
+      - '@fcrl.entity_store'
+      - '@fcrl.page_store'
+      - '%fcrl.parameters%'
+    tags:
+      - { name: context.initializer }
+
+  fcrl.listener.stores:
+    class: '%fcrl.listener.stores.class%'
+    calls:
+      - [ setStore,['%fcrl.entity_store.class%', '@fcrl.entity_store']]
+      - [ setStore,['%fcrl.page_store.class%', '@fcrl.page_store']]
+    tags:
+      - { name: event_dispatcher.subscriber, priority: 0 }

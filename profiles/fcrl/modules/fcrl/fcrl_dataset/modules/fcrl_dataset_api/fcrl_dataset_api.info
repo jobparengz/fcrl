@@ -1,0 +1,8 @@
+name = FCRL Dataset API
+description = Adds package, group, and tag APIs based on the CKAN API.
+package = FCRL API
+core = 7.x
+php = 5.2.4
+dependencies[] = fcrl_dataset
+dependencies[] = fcrl_dataset_content_types
+files[] = tests/fcrl_dataset_api.test

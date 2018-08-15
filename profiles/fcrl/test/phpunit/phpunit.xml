@@ -1,0 +1,52 @@
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         syntaxCheck="false"
+         bootstrap="boot.php"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         colors="true">
+    <testsuites>
+        <testsuite name="FCRL Harvest Test Suite">
+            <file>fcrl_harvest/DatajsonHarvestMigrationTest.php</file>
+            <file>fcrl_harvest/DatajsonHarvestMigrationScenariosTest.php</file>
+            <file>fcrl_harvest/FcrlHarvestDataJsonTest.php</file>
+            <file>fcrl_harvest/FcrlHarvestSourcesTest.php</file>
+            <file>fcrl_harvest/FcrlHarvestTest.php</file>
+            <file>fcrl_harvest/HarvestSourceTest.php</file>
+            <file>fcrl_harvest/HarvestSourceTypeTest.php</file>
+            <file>fcrl_harvest/HarvestCacheTest.php</file>
+        </testsuite>
+        <testsuite name="FCRL Workflow Test Suite">
+            <!--<file>fcrl_workflow/FcrlWorkflowEmailTransition.php</file>
+            <file>fcrl_workflow/FcrlWorkflowTest.php</file>-->
+        </testsuite>
+        <testsuite name="FCRL Dataset Test Suite">
+            <file>fcrl_dataset/DataJsonTest.php</file>
+            <file>fcrl_dataset/getRemoteFileInfoTest.php</file>
+            <file>fcrl_dataset/reclineEmbedCacheTest.php</file>
+            <file>fcrl_dataset/ApiTest.php</file>
+        </testsuite>
+        <testsuite name="FCRL Datastore Test Suite">
+          <file>fcrl_datastore/FcrlDatastoreTest.php</file>
+        </testsuite>
+        <testsuite name="FCRL Datastore API Test Suite">
+            <file>fcrl_datastore_api/FcrlDatastoreAPITest.php</file>
+        </testsuite>
+        <testsuite name="FCRL Datastore Fast Import Test Suite">
+            <file>fcrl_datastore_fast_import/FcrlDatastoreFastImportTest.php</file>
+        </testsuite>
+        <testsuite name="FCRL Migrate Base Test Suite">
+            <!--<file>fcrl_migrate_base/DeleteDuplicateDatasetsTest.php</file>
+            <file>fcrl_migrate_base/FCRLMigrateBaseTest.php</file>-->
+        </testsuite>
+        <testsuite name="Open Data Schema Map Test Suite">
+            <file>open_data_schema_map/PodValidationTest.php</file>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <ini name="display_errors" value="true"/>
+        <includePath>.</includePath>
+    </php>
+</phpunit>

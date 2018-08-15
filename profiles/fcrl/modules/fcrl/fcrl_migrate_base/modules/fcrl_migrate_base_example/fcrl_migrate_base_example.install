@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Installation file for fcrl migration examples.
+ */
+
+/**
+ * Implements hook_disable().
+ */
+function fcrl_migrate_base_example_disable() {
+  fcrl_migrate_base_example_migrations_disable();
+}

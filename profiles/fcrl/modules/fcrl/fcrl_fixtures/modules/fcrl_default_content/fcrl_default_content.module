@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * FCRL Default Content module file.
+ */
+
+/**
+ * Implements hook_migrate_api().
+ */
+function fcrl_default_content_migrate_api() {
+  $api = array(
+    'api' => 2,
+    'migrations' => array(
+      'fcrl_default_content_datasets' => array(
+        'class_name' => 'DefaultContentDatasetImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Datasets'),
+      ),
+      'fcrl_default_content_resources' => array(
+        'class_name' => 'DefaultContentResourceImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Resources'),
+      ),
+      'fcrl_default_content_groups' => array(
+        'class_name' => 'DefaultContentGroupImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Groups'),
+      ),
+      'fcrl_default_content_visualization_entities' => array(
+        'class_name' => 'DefaultContentVisualizationEntityImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Visualization Entities'),
+      ),
+      'fcrl_default_content_data_stories' => array(
+        'class_name' => 'DefaultContentDataStoriesImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Data Stories'),
+      ),
+      'fcrl_default_content_data_dashboards' => array(
+        'class_name' => 'DefaultContentDataDashboardsImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Data Dashboards'),
+      ),
+      'fcrl_default_content_pages' => array(
+        'class_name' => 'DefaultContentPagesImport',
+        'group_name' => 'fcrl_default_content',
+        'title' => t('FCRL Default Pages'),
+      ),
+    ),
+  );
+  return $api;
+}
+
+/**
+ * Implements hook_fcrl_fixtures_register().
+ */
+function fcrl_default_content_fcrl_fixtures_register() {
+  return 'fcrl_default_content';
+}

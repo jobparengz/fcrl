@@ -1,0 +1,20 @@
+{
+    "name": "mis/drupal-fcrl-extension",
+    "description": "Provides base FCRL class for Drupal Extension",
+    "keywords": ["drupal", "web", "test"],
+    "require": {
+        "drupal/drupal-extension": "~3.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "acouch",
+            "email": "aaron@example.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+          "Drupal\\FCRLExtension\\": "src/"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "fishcoral_project",
+  "description": "A Radix based subtheme built for FCRL.",
+  "browserSyncProxy" : "http://fcrl.local",
+  "bowerDir": "./bower_components",
+  "css": {
+    "file" : "fishcoral_project.style.scss",
+    "src": [
+      "scss/**/*.scss"
+    ],
+    "dest": "assets/css",
+    "includePaths": [
+      "./bower_components/bootstrap-sass/assets/stylesheets",
+      "./bower_components/font-awesome/scss",
+      "./bower_components/compass-mixins/lib"
+    ]
+  },
+  "js": {
+    "file" : "fishcoral_project.script.js",
+    "src": [
+      "js/**/*.js"
+    ],
+    "dest": "assets/js"
+  },
+  "images": {
+    "src": [
+      "assets/images/**/*"
+    ],
+    "dest": "assets/images/"
+  },
+  "fonts": {
+    "src": [
+      "./bower_components/font-awesome/fonts/**.*"
+    ],
+    "dest": "./assets/fonts/"
+  }
+}

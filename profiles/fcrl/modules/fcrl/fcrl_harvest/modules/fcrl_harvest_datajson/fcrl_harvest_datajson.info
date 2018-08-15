@@ -1,0 +1,7 @@
+name = Fcrl Harvest Data Json
+description = Provide Data Json endpoints support for Fcrl Harvest.
+package = FCRL Harvest
+core = 7.x
+
+dependencies[] = fcrl_harvest
+files[] = fcrl_harvest_datajson.migrate.inc

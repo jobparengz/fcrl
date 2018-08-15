@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the common_body_class module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function common_body_class_schema() {
+  $schema['common_body_class'] = array(
+    'description' => 'Stores common_body_class settings, such as visibility settings.',
+    'fields' => array(
+      'cbcid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique common body class ID.',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Common body class enabled status. (1 = enabled, 0 = disabled)',
+      ),
+      'visibility' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Flag to indicate how to show class in body tag on pages. (0 = Show on all pages except listed pages, 1 = Show only on listed pages)',
+      ),
+      'pages' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => 'Contents of the "Pages" common body class; contains either a list of paths on which to include/exclude the common body class.',
+      ),
+      'class_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Custom class name for the common body class.',
+      ),
+    ),
+    'primary key' => array('cbcid'),
+  );
+
+  $schema['common_body_class_role'] = array(
+    'description' => 'Sets up access permissions for common body class based on user roles',
+    'fields' => array(
+      'cbcid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The common body class's id.",
+      ),
+      'rid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The user's role ID from {users_roles}.rid.",
+      ),
+    ),
+  );
+
+  return $schema;
+}

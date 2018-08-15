@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Install file for FCRL Groups.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function fcrl_dataset_groups_install() {
+  // Disable selected views enabled by contributed modules.
+  $views_disable = array(
+    'og_extras_nodes' => TRUE,
+  );
+  variable_set('views_defaults', $views_disable);
+}
+
+/**
+ * Implements hook_disable().
+ */
+function fcrl_dataset_groups_disable() {
+  // Remove field groups from the index.
+  features_revert(array('fcrl_sitewide_search_db' => array('search_api_index', 'search_api_server')));
+}

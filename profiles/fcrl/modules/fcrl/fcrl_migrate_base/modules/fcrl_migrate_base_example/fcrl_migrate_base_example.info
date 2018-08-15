@@ -1,0 +1,6 @@
+name = "FCRL Migrate Base"
+description = "FCRL migration base example."
+package = "FCRL"
+core = 7.x
+dependencies[] = fcrl_migrate_base
+dependencies[] = open_data_federal_extras

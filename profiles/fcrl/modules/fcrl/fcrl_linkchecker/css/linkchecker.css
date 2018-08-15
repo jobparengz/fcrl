@@ -1,0 +1,21 @@
+.view-fcrl-linkchecker-reports {
+  font-family: arial;
+  font-size: 12px;
+  font-weight: normal;
+}
+.view-fcrl-linkchecker-reports .views-exposed-form .views-exposed-widget {
+  padding-top: 0;
+}
+.view-fcrl-linkchecker-reports th.views-field-nothing {
+  text-align: center;
+}
+.view-fcrl-linkchecker-reports td.views-field-nothing a:hover {
+  text-decoration: none;
+}
+.view-fcrl-linkchecker-reports td.views-field-nothing a .btn-primary {
+  margin: 2px;
+  padding: 4px 8px;
+}
+.view-fcrl-linkchecker-reports .views-field i {
+  font-size: 1.5em;
+}

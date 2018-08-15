@@ -1,0 +1,46 @@
+.pane-fcrl-sitewide-panels-fcrl-user-summary img {
+  float: left;
+  margin-left: -80px;
+  margin-bottom: 10px;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary p {
+  font-size: 14px;
+  margin: 10px 0;
+  line-height: normal;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .profile-stats {
+  padding-left: 80px;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .profile-stats p {
+  font-size: 12px;
+  margin: 0px;
+  line-height: normal;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .view-list-of-users-groups {
+  position: relative;
+  display: block;
+  padding: 0;
+  text-decoration: none;
+  margin: 0 -15px;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .view .group-membership a {
+  display: block;
+  padding: 6px 10px;
+  position: relative;
+  line-height: 22px;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .view .group-membership a:before {
+  content: "\e981";
+  font-family: 'FCRL-Topics';
+  font-style: normal;
+  margin-right: .5em;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .view .group-membership a:hover {
+  background: rgba(0, 0, 0, 0.03);
+  text-decoration: none;
+}
+.pane-fcrl-sitewide-panels-fcrl-user-summary .view .view-empty p {
+  padding: 0 15px;
+  margin-bottom: 0;
+  clear: both;
+}

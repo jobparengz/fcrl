@@ -1,0 +1,8 @@
+name = FCRL Plugins
+description = Custom cTools plugins for FCRL
+core = 7.x
+package = FCRL
+dependencies[] = ctools
+dependencies[] = panels
+project path = profiles/fcrl/modules/fcrl
+scripts[] = js/colorPicker.behavior.js

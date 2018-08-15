@@ -1,0 +1,5 @@
+name = Taxonomy Fixtures Example
+core = 7.x
+package = FCRL
+project = taxonomy_fixtures_example
+dependencies[] = taxonomy_fixtures

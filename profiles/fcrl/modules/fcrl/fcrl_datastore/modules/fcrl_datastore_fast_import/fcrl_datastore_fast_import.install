@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Fast import install.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function fcrl_datastore_fast_import_enable() {
+  fcrl_datastore_check_database();
+}

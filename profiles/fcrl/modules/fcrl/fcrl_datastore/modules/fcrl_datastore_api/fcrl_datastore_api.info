@@ -1,0 +1,6 @@
+name = FCRL Datastore API
+description = Access datastore info over json.
+package = FCRL API
+core = 7.x
+dependencies[] = services
+

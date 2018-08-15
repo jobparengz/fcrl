@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the fcrl_sitewide_demo_front feature.
+ */
+
+include_once 'fcrl_sitewide_demo_front.features.inc';

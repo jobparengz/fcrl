@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @file
+ * Install file for FCRL Topics.
+ */
+
+/**
+ * Check if there are already terms and if not import default terms.
+ */
+function fcrl_default_topics_install() {
+  $vocab = taxonomy_vocabulary_machine_name_load('fcrl_topics');
+  $terms = taxonomy_get_tree($vocab->vid);
+  if (empty($terms) && module_exists('taxonomy_fixtures') && module_exists('fcrl_default_topics')) {
+    $vocab = fcrl_default_topics_taxonomy_fixtures_vocabulary();
+    taxonomy_fixtures_import_terms($vocab);
+  }
+}

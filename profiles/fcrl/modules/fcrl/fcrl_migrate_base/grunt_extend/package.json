@@ -1,0 +1,10 @@
+{
+  "name": "fcrlMigrateBase",
+  "description" : "Makes fcrl migrate base",
+  "version": "0.1.0",
+  "dependencies": {
+    "grunt": "~0.4.5",
+    "grunt-mkdir": "0.1.2",
+    "grunt-template": "*"
+  }
+}

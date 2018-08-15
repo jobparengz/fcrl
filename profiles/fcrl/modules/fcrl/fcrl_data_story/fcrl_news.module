@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Code for the FCRL News.
+ */
+
+include_once 'fcrl_news.features.inc';
+
+/**
+ * Hook: hook_node_view().
+ */
+function fcrl_news_node_view($node, $view_mode, $langcode) {
+
+  if ($node->type == 'fcrl_news') {
+    // Add CSS to adjust the size of the images to the width of the container.
+    drupal_add_css(drupal_get_path('module', 'fcrl_news') . '/css/fcrl_news.css');
+  }
+}

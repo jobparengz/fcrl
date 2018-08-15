@@ -1,0 +1,13 @@
+name = "FCRL Migrate Base"
+description = "FCRL migration base."
+package = "FCRL"
+core = 7.x
+dependencies[] = fcrl_dataset
+dependencies[] = migrate (7.x-2.x-dev)
+dependencies[] = list
+dependencies[] = number
+files[] = fcrl_migrate_base.migrate.inc
+files[] = fcrl_migrate_base_group.inc
+files[] = fcrl_migrate_base_dataset.inc
+files[] = fcrl_migrate_base_resource.inc
+files[] = fcrl_migrate_base_data_json.inc

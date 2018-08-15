@@ -1,0 +1,8 @@
+name = FCRL Default Topics
+description = Default topic terms.
+core = 7.x
+package = FCRL Features
+dependencies[] = fcrl_topics
+dependencies[] = taxonomy_fixtures
+dependencies[] = taxonomy
+

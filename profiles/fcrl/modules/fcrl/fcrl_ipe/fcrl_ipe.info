@@ -1,0 +1,10 @@
+name = FCRL In-Place Editor
+description = Customizations to panels IPE
+core = 7.x
+package = FCRL
+dependencies[] = ctools
+dependencies[] = fcrl_plugins
+dependencies[] = panels
+dependencies[] = strongarm
+features[features_api][] = api:2
+project path = profiles/fcrl/modules/fcrl

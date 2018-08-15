@@ -1,0 +1,16 @@
+name = FCRL Fixtures 
+description = Saves FCRL API endpoints to local files to be used as fixtures
+core = 7.x
+package = FCRL
+
+dependencies[] = 'open_data_schema_map_fcrl'
+dependencies[] = 'fcrl_migrate_base'
+
+files[] = includes/data_dashboard.inc
+files[] = includes/data_story.inc
+files[] = includes/dataset.inc
+files[] = includes/group.inc
+files[] = includes/page.inc
+files[] = includes/panelized_node.inc
+files[] = includes/resource.inc
+files[] = includes/visualization_entity.inc

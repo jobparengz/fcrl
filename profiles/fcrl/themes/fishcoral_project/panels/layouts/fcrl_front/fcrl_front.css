@@ -1,0 +1,37 @@
+.panel-fcrl-front {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.panel-fcrl-front .panel-hero,
+.panel-fcrl-front .panel-top-full,
+.panel-fcrl-front .panel-bottom-full {
+  width: 100%;
+  clear: both;
+}
+
+.panel-fcrl-front .inside {
+  padding: 15px;
+}
+.panel-fcrl-front .panel-hero .inside {
+  padding: 30px 15px;
+}
+
+.panel-fcrl-front .panel-hero .panel-col-first,
+.panel-fcrl-front .panel-hero .panel-col-second,
+.panel-fcrl-front .panel-bottom .panel-col-first,
+.panel-fcrl-front .panel-bottom .panel-col-second {
+  width: 50%;
+  float: left;
+}
+
+.panel-fcrl-front .panel-triplet .panel-col-first,
+.panel-fcrl-front .panel-triplet .panel-col-second,
+.panel-fcrl-front .panel-triplet .panel-col-third {
+  width: 33.333%;
+  float: left;
+}
+
+.panel-fcrl-front .panel-separator {
+  margin: 0;
+}

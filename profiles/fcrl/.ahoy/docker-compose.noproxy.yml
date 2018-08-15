@@ -1,0 +1,11 @@
+version: "2"
+services:
+  web:
+    environment:
+      - VIRTUAL_HOST=fcrl.docker
+      - no_proxy=localhost
+      #- VIRTUAL_PROTO=https
+  cli:
+    environment:
+      - PHP_IDE_CONFIG=serverName=fcrl.docker
+      - VIRTUAL_HOST=fcrl.docker

@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the FCRL Dataset Voting feature.
+ */
+
+include_once 'fcrl_dataset_voting.features.inc';

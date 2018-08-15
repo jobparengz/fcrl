@@ -1,0 +1,14 @@
+name = Visualization Entity Recline Field Reference
+description = FCRL Integration module. Provides a field to visualization entity to link FCRL resources. See http://github.com/MiS/fcrl for more information.
+core = 7.x
+package = Data Visualization
+
+dependencies[] = entityreference
+dependencies[] = fcrl_dataset_content_types
+dependencies[] = recline
+dependencies[] = uuidreference
+dependencies[] = uuidreference_select
+features[features_api][] = api:2
+features[field_base][] = field_uuid_resource
+project path = profiles/fcrl/modules/contrib
+

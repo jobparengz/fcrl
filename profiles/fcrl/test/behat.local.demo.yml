@@ -1,0 +1,21 @@
+imports:
+  -  behat.yml
+
+default:
+  extensions:
+    Behat\MinkExtension:
+      files_path: "/Users/Username/path/to/vagrant/machine/www/fcrl/test/files/"
+      base_url: "http://fcrl.local"
+      browser_name: "chrome"
+      selenium2:
+        wd_host: "http://33.33.33.1:4444/wd/hub"
+        capabilities:
+          extra_capabilities:
+            chromeOptions:
+              args:
+                - "--disable-web-security"
+    Drupal\DrupalExtension:
+      drupal:
+        drupal_root: "/var/www/fcrl/webroot"
+      drush:
+        root: "/var/www/fcrl/webroot"

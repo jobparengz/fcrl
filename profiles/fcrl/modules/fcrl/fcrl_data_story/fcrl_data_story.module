@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Code for the FCRL Data Story.
+ */
+
+include_once 'fcrl_data_story.features.inc';
+
+/**
+ * Hook: hook_node_view().
+ */
+function fcrl_data_story_node_view($node, $view_mode, $langcode) {
+
+  if ($node->type == 'fcrl_data_story') {
+    // Add CSS to adjust the size of the images to the width of the container.
+    drupal_add_css(drupal_get_path('module', 'fcrl_data_story') . '/css/fcrl_data_story.css');
+  }
+}

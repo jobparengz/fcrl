@@ -1,0 +1,469 @@
+<?php
+
+/**
+ * @file
+ * Install functions and update hooks for FCRL profile.
+ */
+
+/**
+ * Reverts fcrl_sitewide to add Markdown filter. Sets up roleassign feature.
+ */
+function fcrl_update_7001() {
+  module_load_include("profile", "fcrl");
+  fcrl_bueditor_markdown_install();
+}
+
+/**
+ * Rename a field.
+ *
+ * Addapted from field_rename_rename_fields() in 'Field Rename' module.
+ *
+ * @param string $old_field_name
+ *   The old name of the field.
+ * @param string $new_field_name
+ *   The new name of the field.
+ */
+function fcrl_rename_field($old_field_name, $new_field_name) {
+
+  $messages = array();
+
+  // Read field data.
+  $old_field = field_read_field($old_field_name);
+  if (empty($old_field)) {
+    $messages[] = t('The field %old_field_name does not exist so it cannot be renamed.', array('%old_field_name' => $old_field_name));
+    return $messages;
+  }
+
+  try {
+    // Update {field_config}.
+    db_update('field_config')
+      ->fields(array('field_name' => $new_field_name))
+      ->condition('id', $old_field['id'])
+      ->execute();
+
+    // Update {field_config_instance}.
+    db_update('field_config_instance')
+      ->fields(array('field_name' => $new_field_name))
+      ->condition('field_id', $old_field['id'])
+      ->execute();
+
+    // The tables that need updating in the form 'old_name' => 'new_name'.
+    $tables = array(
+      'field_data_' . $old_field_name => 'field_data_' . $new_field_name,
+      'field_revision_' . $old_field_name => 'field_revision_' . $new_field_name,
+    );
+
+    // Iterate through tables to be redefined and renamed.
+    foreach ($tables as $old_table => $new_table) {
+      // Iterate through the field's columns. For example, a 'text' field will
+      // have columns 'value' and 'format'.
+      foreach ($old_field['columns'] as $column_name => $column_definition) {
+        // Column names are in the format {field_name}_{column_name}.
+        $old_column_name = $old_field_name . '_' . $column_name;
+        $new_column_name = $new_field_name . '_' . $column_name;
+
+        // If there is an index for the field, drop and then re-add it.
+        $has_index = isset($old_field['indexes'][$column_name]) && ($old_field['indexes'][$column_name] == array($column_name));
+        if ($has_index) {
+          db_drop_index($old_table, $old_column_name);
+        }
+
+        // Rename the column.
+        db_change_field($old_table, $old_column_name, $new_column_name, $column_definition);
+
+        if ($has_index) {
+          db_drop_index($old_table, $new_column_name);
+          db_add_index($old_table, $new_column_name, array($new_column_name));
+        }
+      }
+
+      // The new table may exist e.g. due to having been included in a feature
+      // that was reverted prior to this update being run. If so, we need to
+      // drop the new table so that the old one can be renamed.
+      if (db_table_exists($new_table)) {
+        db_drop_table($new_table);
+      }
+
+      // Rename the table.
+      db_rename_table($old_table, $new_table);
+    }
+  }
+  catch (Exception $e) {
+    $messages[] = t('The field %old_field_name could not be renamed because there was an error: %error.',
+      array('%old_field_name' => $old_field_name, '%error' => $e->getMessage()));
+  }
+
+  cache_clear_all('*', 'cache_field', TRUE);
+
+  return $messages;
+}
+
+/**
+ * Update the default jquery library to 1.10.
+ */
+function fcrl_update_7002() {
+  if (version_compare(variable_get('jquery_update_jquery_version'), '1.10', '<')) {
+    variable_set('jquery_update_jquery_version', '1.10');
+  }
+}
+
+/**
+ * Disable the fcrl_default_content module.
+ */
+function fcrl_update_7005() {
+  db_update('system')
+    ->fields(array('status' => '0'))
+    ->condition('name', 'fcrl_default_content')
+    ->execute();
+}
+
+/**
+ * We need to revert field instances.
+ *
+ * This is required for the next update in another case
+ * we have problem with new fields added on version 12.
+ */
+function fcrl_update_7006() {
+  module_enable(array('field_hidden'));
+  features_revert(array('fcrl_datastore' => array('field_base', 'field_instance')));
+}
+
+/**
+ * Resource group field.
+ *
+ * Groups cannot be edited manually on resources anymore. Group affiliation
+ * will be inherited from parent datasets. This update hook was added to be sure
+ * that all resources that do not have groups assigned are synchronized and
+ * updated with the groups from the parent datasets.
+ */
+function fcrl_update_7007(&$sandbox) {
+
+  if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['max'] = db_query("SELECT COUNT(DISTINCT fdr.field_dataset_ref_target_id) FROM {node} n LEFT JOIN {field_data_field_dataset_ref} fdr ON fdr.entity_id=n.nid LEFT JOIN {og_membership} og ON n.nid=og.etid WHERE n.type='resource' AND og.etid IS NULL AND fdr.field_dataset_ref_target_id IN (SELECT etid FROM {og_membership} WHERE etid IN (SELECT field_dataset_ref_target_id FROM {field_data_field_dataset_ref}))")->fetchField();
+  }
+
+  // Get all resources without group but the parent dataset has groups.
+  $result = db_query("SELECT DISTINCT fdr.field_dataset_ref_target_id FROM {node} n LEFT JOIN {field_data_field_dataset_ref} fdr ON fdr.entity_id=n.nid LEFT JOIN {og_membership} og ON n.nid=og.etid WHERE n.type='resource' AND og.etid IS NULL AND fdr.field_dataset_ref_target_id IN (SELECT etid FROM {og_membership} WHERE etid IN (SELECT field_dataset_ref_target_id FROM {field_data_field_dataset_ref})) LIMIT 0,10");
+
+  foreach ($result as $item) {
+    // Simulate a empty original.
+    // The 'fcrl_dataset_sync_groups' function synchronizes
+    // the groups only when a change on the dataset is detected.
+    $original = new stdClass();
+    $original->type = 'dataset';
+    $original->og_group_ref = array();
+    $dataset = node_load($item->field_dataset_ref_target_id);
+    $dataset->original = $original;
+    fcrl_dataset_sync_groups($dataset);
+    $sandbox['progress']++;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+
+  return t('All resources without group were updated.');
+
+}
+
+/**
+ * Point source menu to the command menu center in fcrl workflow roles.
+ */
+function fcrl_update_7008() {
+  if (module_exists('fcrl_workflow')) {
+    fcrl_workflow_admin_menu_source();
+  }
+}
+
+/**
+ * Flush client site colorizer file to grab new updates.
+ */
+function fcrl_update_7009() {
+  $theme = $GLOBALS['theme'];
+  $instance = $theme;
+  variable_del('colorizer_' . $instance . '_files');
+  colorizer_clearcache();
+  cache_clear_all();
+}
+
+/**
+ * Disable/uninstall deprecated fcrl_dataset_api, enable open_data_schema_map.
+ */
+function fcrl_update_7010() {
+  if (module_exists('fcrl_dataset_api')) {
+    module_disable(array('fcrl_dataset_api'));
+    drupal_uninstall_modules(array('fcrl_dataset_api'));
+    module_enable(array('open_data_schema_map'));
+  }
+}
+
+/**
+ * Update copyright information.
+ */
+function fcrl_update_7011() {
+  $settings = variable_get('theme_fishcoral_project_settings', array());
+  if ($settings['copyright']['value'] == 'Powered by <a href="http://mis.com/fcrl">FCRL</a>, a project of <a href="http://mis.com">MiS</a>') {
+    $settings['copyright']['value'] = t('Powered by <a href="http://getfcrl.com/">FCRL</a>, a project of <a href="http://granicus.com">Ifad</a>');
+    variable_set('theme_fishcoral_project_settings', $settings);
+  }
+}
+
+/**
+ * Clean up db on upgrade to 7.x-1.13.
+ *
+ * Deprecated modules: Conditional Fields, Entity RDF, RDF UI, RDF Extensions.
+ */
+function fcrl_update_7012() {
+  if (!module_exists('conditional_fields')) {
+    db_delete('system')
+      ->condition('name', 'conditional_fields')
+      ->condition('type', 'module')
+      ->execute();
+    db_drop_table('conditional_fields');
+  }
+  if (!module_exists('entity_rdf')) {
+    db_delete('system')
+      ->condition('name', 'entity_rdf')
+      ->condition('type', 'module')
+      ->execute();
+  }
+  if (!module_exists('rdfui')) {
+    db_delete('system')
+      ->condition('name', 'rdfui')
+      ->condition('type', 'module')
+      ->execute();
+  }
+  if (!module_exists('rdfx')) {
+    db_delete('system')
+      ->condition('name', 'rdfx')
+      ->condition('type', 'module')
+      ->execute();
+
+    db_drop_table('rdfx_namespaces');
+    db_drop_table('rdfx_term_details');
+    db_drop_table('rdfx_term_domains');
+    db_drop_table('rdfx_term_inverses');
+    db_drop_table('rdfx_term_ranges');
+    db_drop_table('rdfx_term_superclasses');
+    db_drop_table('rdfx_term_superproperties');
+    db_drop_table('rdfx_term_types');
+    db_drop_table('rdfx_terms');
+    db_drop_table('rdfx_vocabulary_details');
+    db_drop_table('rdfx_vocabulary_graphs');
+  }
+}
+
+/**
+ * Remove deprecated test and theme directories.
+ */
+function fcrl_update_7013() {
+  $deprecated = array(
+    'profiles/fcrl/modules/fcrl/fcrl_dataset/fonts',
+    'profiles/fcrl/modules/fcrl/fcrl_dataset/tests',
+    'profiles/fcrl/modules/fcrl/fcrl_datastore/tests',
+    'profiles/fcrl/modules/fcrl/fcrl_datastore/modules/fcrl_datastore_api/tests',
+    'profiles/fcrl/modules/fcrl/fcrl_datastore/modules/fcrl_datastore_fast_import/test',
+    'profiles/fcrl/modules/fcrl/fcrl_workflow/test',
+    'profiles/fcrl/themes/contrib/fishcoral_project',
+    'profiles/fcrl/themes/contrib/omega',
+  );
+  foreach ($deprecated as $dir) {
+    if (is_dir($dir)) {
+      drupal_rmdir($dir);
+    }
+  }
+}
+
+/**
+ * Drop the 'field_modified_source_date' field.
+ */
+function fcrl_update_7014() {
+  // Mark the field for deletion.
+  field_delete_field('field_modified_source_date');
+  // Run the batch process to actually delete the field.
+  $batch_size = 1;
+  field_purge_batch($batch_size);
+}
+
+/**
+ * Update the default jquery library to 1.10 (again).
+ */
+function fcrl_update_7015() {
+  if (version_compare(variable_get('jquery_update_jquery_version'), '1.10', '<')) {
+    variable_set('jquery_update_jquery_version', '1.10');
+  }
+}
+
+/**
+ * Add data dictionary textarea id to bueditor excludes list.
+ */
+function fcrl_update_7016() {
+  db_update('bueditor_editors')
+    ->fields(array(
+      'excludes' => 'edit-log
+edit-menu-description
+*data-dictionary*',
+    ))
+    ->condition('eid', '5')
+    ->execute();
+}
+
+/**
+ * Update chosen_jquery_selector to avoid misuse.
+ */
+function fcrl_update_7017() {
+  variable_set('chosen_jquery_selector',
+    '.page-node select:not([class*="delta-order"], [name*="workbench_moderation"], [class*="filter-list"], [id*="delimiter"],[name*="sort_by"],[name*="sort_order"])');
+}
+
+/**
+ * Update language field values to use dashes rather than underscores.
+ */
+function fcrl_update_7018() {
+  db_update('field_data_field_language')
+    ->expression('field_language_value', 'replace(field_language_value, :underscore, :dash)', array(':underscore' => '_', ':dash' => '-'))
+    ->execute();
+
+  db_update('field_revision_field_language')
+    ->expression('field_language_value', 'replace(field_language_value, :underscore, :dash)', array(':underscore' => '_', ':dash' => '-'))
+    ->execute();
+
+}
+
+/**
+ * Remove old variables from fcrl_dataset_api.
+ */
+function fcrl_update_7019() {
+  variable_del('fcrl_catalog_desc');
+  variable_del('fcrl_catalog_contact');
+  variable_del('fcrl_catalog_mbox');
+  variable_del('fcrl_dataset_api_site_read');
+  variable_del('fcrl_dataset_api_data_json');
+  variable_del('fcrl_dataset_api_revision_list');
+  variable_del('fcrl_dataset_api_package_list');
+  variable_del('fcrl_dataset_api_current_package_list_with_resources');
+  variable_del('fcrl_dataset_api_package_show');
+  variable_del('fcrl_dataset_api_resource_show');
+  variable_del('fcrl_dataset_api_group_package_show');
+  variable_del('fcrl_dataset_api_package_revision_list');
+  variable_del('fcrl_dataset_api_group_list');
+}
+
+/**
+ * Update chosen_jquery_selector to avoid misuse.
+ */
+function fcrl_update_7020() {
+  // REF #1936, #1890.
+  variable_set('chosen_jquery_selector',
+    '.page-node select:not([class*="delta-order"], [name*="workbench_moderation"], [class*="filter-list"], [id*="delimiter"],[name*="sort_by"],[name*="sort_order"], [id*="lines-terminated-by"])');
+}
+
+/**
+ * Add data dictionary textarea id to bueditor excludes list.
+ *
+ * This is similar to 'fcrl_update_7016' but loading the ID from the DB first.
+ */
+function fcrl_update_7021() {
+  $eid = db_select("bueditor_editors", "bue")
+    ->fields("bue", array("eid"))
+    ->condition("name", "Markdowneditor")
+    ->execute()
+    ->fetchField();
+
+  db_update('bueditor_editors')
+    ->fields(array(
+      'excludes' => 'edit-log
+        edit-menu-description
+        *data-dictionary*',
+    ))
+    ->condition('eid', $eid)
+    ->execute();
+}
+
+/**
+ * Update chosen_jquery_selector to include language selectors.
+ */
+function fcrl_update_7022() {
+  // REF #1936, #1890.
+  variable_set('chosen_jquery_selector',
+    '.page-node select:not([class*="delta-order"], [name*="workbench_moderation"], [class*="filter-list"], [id*="delimiter"],[name*="sort_by"],[name*="sort_order"], [id*="lines-terminated-by"], [id*="lang-dropdown-select-language"])');
+}
+
+/**
+ * Remove deprecated modules from the db: menu_token and remote_file_source.
+ */
+function fcrl_update_7023() {
+  if (!module_exists('menu_token')) {
+    db_delete('system')
+      ->condition('name', 'menu_token')
+      ->condition('type', 'module')
+      ->execute();
+    db_drop_table('menu_token');
+  }
+  if (!module_exists('remote_file_source')) {
+    db_delete('system')
+      ->condition('name', 'remote_file_source')
+      ->condition('type', 'module')
+      ->execute();
+  }
+}
+
+/**
+ * Update default variables.
+ */
+function fcrl_update_7024(&$context) {
+  fcrl_misc_variables_set($context);
+}
+
+/**
+ * Update copyright information.
+ */
+function fcrl_update_7025() {
+  $settings = variable_get('theme_fishcoral_project_settings', array());
+  if ($settings['copyright']['value'] == 'Powered by <a href="http://getfcrl.com/">FCRL</a>, a project of <a href="http://granicus.com">Mis</a>') {
+    $settings['copyright']['value'] = t('Powered by <a href="https://getfcrl.org/">FCRL</a>');
+    variable_set('theme_fishcoral_project_settings', $settings);
+  }
+}
+
+/**
+ * Revert content types dataset to revert og_group_ref on resources.
+ */
+function fcrl_update_7026() {
+  features_revert(array('fcrl_dataset_content_types' => array('field_base', 'field_instance')));
+}
+
+/**
+ * Make sure revised settings for harvest dates are applied. See #2495.
+ */
+function fcrl_update_7027() {
+  features_revert_module('fcrl_dataset_content_types');
+
+  // Get a list of harvested datasets.
+  $harvested_nids = db_select('field_data_field_harvest_source_ref', 'hsr')
+    ->fields('hsr', array('entity_id'))
+    ->execute()
+    ->fetchCol();
+
+  // Get a list of all datasets.
+  $dataset_ids = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('type', 'dataset')
+    ->execute()
+    ->fetchCol();
+
+  // Process all datasets to clear the harvest dates from non-harvested entries.
+  $count = 0;
+  foreach ($dataset_ids as $nid) {
+    // Delete the entries for non-harvested datasets.
+    if (!in_array($nid, $harvested_nids)) {
+      db_delete('field_data_field_harvest_source_modified')
+      ->condition('entity_id', $nid)
+      ->execute();
+      db_delete('field_data_field_harvest_source_issued')
+      ->condition('entity_id', $nid)
+      ->execute();
+    }
+    $count = $count + 1;
+  }
+  drupal_set_message(t('Removed harvest date values from @var non-harvested datasets.', array('@var' => $count)), 'status');
+}

@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Code for the FCRL Dataset Groups Permissions feature.
+ */
+
+include_once 'fcrl_dataset_groups_perms.features.inc';

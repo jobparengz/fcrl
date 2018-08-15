@@ -1,0 +1,5 @@
+name = FCRL Harvest Test
+description = Test module for fcrl_harvest
+core = 7.x
+
+dependencies[] = 'fcrl_harvest'

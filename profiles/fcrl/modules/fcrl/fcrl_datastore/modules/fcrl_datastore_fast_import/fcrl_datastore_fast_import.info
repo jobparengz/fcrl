@@ -1,0 +1,6 @@
+name = FCRL Datastore Fast Import
+description = Enable fast import for resources
+core = 7.x
+package = FCRL
+dependencies[] = fcrl_datastore
+
